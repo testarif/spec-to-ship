@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="An interactive Spec to Ship demo, from an idea to a working application preview.">
+  <title>Spec to Ship — Live Demo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b10;
+      --panel: #11151e;
+      --panel-2: #151a24;
+      --line: #252c39;
+      --text: #f2f4f8;
+      --muted: #9aa3b3;
+      --subtle: #687284;
+      --blue: #9aafff;
+      --green: #65d5a1;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { min-width: 320px; background: var(--bg); scroll-behavior: smooth; }
+    body { margin: 0; color: var(--text); font-family: var(--sans); background: radial-gradient(ellipse at 74% 0%, #172035 0, #0c1019 35rem, var(--bg) 75rem); }
+    button { color: inherit; font: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    .page { width: min(1380px, calc(100% - 64px)); margin: 0 auto; padding: 24px 0 56px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 0 25px; border-bottom: 1px solid #252b36; }
+    .brand { display: flex; align-items: center; gap: 11px; color: var(--text); text-decoration: none; font-size: 17px; font-weight: 800; letter-spacing: -.06em; }
+    .brand-mark { display: flex; width: 27px; height: 27px; align-items: end; justify-content: center; gap: 3px; padding: 5px; border: 1px solid #35425e; border-radius: 8px; background: #141c2d; }
+    .brand-mark i { width: 3px; border-radius: 3px; background: #91aaff; }
+    .brand-mark i:nth-child(1) { height: 7px; opacity: .65; }
+    .brand-mark i:nth-child(2) { height: 12px; }
+    .brand-mark i:nth-child(3) { height: 9px; opacity: .8; }
+    .brand em { color: var(--blue); font-style: normal; font-weight: 600; }
+    .demo-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid #354232; border-radius: 999px; background: #111a17; color: #b4d8c5; font: 10px var(--mono); letter-spacing: .09em; }
+    .demo-badge::before { width: 6px; height: 6px; border-radius: 50%; background: var(--green); content: ""; box-shadow: 0 0 10px #65d5a188; }
+    .intro { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, .7fr); align-items: end; gap: 40px; padding: 43px 0 29px; }
+    .eyebrow { margin: 0 0 13px; color: #9caee4; font: 11px var(--mono); letter-spacing: .17em; text-transform: uppercase; }
+    h1 { max-width: 760px; margin: 0; font-size: clamp(32px, 4.5vw, 54px); font-weight: 650; letter-spacing: -.065em; line-height: 1.06; }
+    h1 span { color: var(--blue); }
+    .lead { max-width: 685px; margin: 17px 0 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
+    .idea-card { padding: 16px 17px; border: 1px solid #30394a; border-radius: 12px; background: #111722c9; }
+    .idea-card small { color: #7e8aa0; font: 10px var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+    .idea-card p { margin: 9px 0 0; color: #e4e8f0; font-size: 13px; line-height: 1.6; }
+    .skill-agent-note { margin-top: 15px; padding-top: 13px; border-top: 1px solid #293140; color: #9da7b8; font-size: 11px; line-height: 1.6; }
+    .skill-agent-note strong { color: #dfe5f1; }
+    .pipeline-panel { padding: 22px 21px 20px; border: 1px solid #29303c; border-radius: 15px; background: linear-gradient(145deg, #121722ed, #0f131bed); box-shadow: 0 24px 70px #0002; }
+    .section-top { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
+    .section-top h2 { margin: 0; font-size: 14px; font-weight: 650; letter-spacing: -.02em; }
+    .section-top p { margin: 5px 0 0; color: var(--subtle); font-size: 11px; }
+    .run-controls { display: flex; align-items: center; gap: 10px; }
+    .run-state { color: var(--muted); font: 10px var(--mono); white-space: nowrap; }
+    .run-state[data-state="running"] { color: #a8bbff; }
+    .run-state[data-state="done"] { color: var(--green); }
+    .primary-btn { min-height: 37px; padding: 0 13px; border: 1px solid #9aafff; border-radius: 8px; background: #a5b6ff; color: #111725; font-size: 11px; font-weight: 750; cursor: pointer; transition: transform .16s ease, background .16s ease; }
+    .primary-btn:hover { transform: translateY(-1px); background: #bdc9ff; }
+    .primary-btn:disabled { cursor: wait; opacity: .65; transform: none; }
+    .stages { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 9px; }
+    .stage { --tone: #93a9ff; position: relative; min-height: 106px; padding: 13px 12px 12px; border: 1px solid #2b3240; border-radius: 10px; background: #141923; transition: border-color .25s ease, background .25s ease, transform .25s ease; }
+    .stage:not(:last-child)::after { position: absolute; z-index: 1; top: 29px; right: -11px; width: 11px; height: 1px; background: #414a5a; content: ""; }
+    .stage:nth-child(2) { --tone: #c0a6ff; }
+    .stage:nth-child(3) { --tone: #66d9c4; }
+    .stage:nth-child(4) { --tone: #f2c273; }
+    .stage:nth-child(5) { --tone: #ff91aa; }
+    .stage:nth-child(6) { --tone: #65d5a1; }
+    .stage.active { border-color: color-mix(in srgb, var(--tone) 70%, #2b3240); background: color-mix(in srgb, var(--tone) 9%, #141923); transform: translateY(-2px); box-shadow: 0 0 22px color-mix(in srgb, var(--tone) 12%, transparent); }
+    .stage.done { border-color: color-mix(in srgb, var(--tone) 42%, #2b3240); }
+    .stage-index { display: flex; align-items: center; justify-content: space-between; color: var(--tone); font: 10px var(--mono); letter-spacing: .1em; }
+    .stage-mark { color: #758097; font: 12px var(--mono); }
+    .stage.done .stage-mark { color: var(--green); }
+    .stage h3 { margin: 14px 0 4px; font-size: 14px; font-weight: 650; }
+    .stage p { margin: 0; color: #8b95a6; font-size: 10px; }
+    .stage-command { display: inline-block; margin-top: 9px; color: #768197; font: 9px var(--mono); }
+    .progress-track { height: 3px; margin-top: 20px; overflow: hidden; border-radius: 5px; background: #252c39; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9aafff, #65d5a1); transition: width .6s ease; }
+    .lower-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(330px, .9fr); gap: 15px; margin-top: 15px; }
+    .card { min-width: 0; border: 1px solid #29303c; border-radius: 13px; background: #10141c; }
+    .card-heading { display: flex; min-height: 58px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 17px; border-bottom: 1px solid #262d39; }
+    .card-heading h2 { margin: 0; font-size: 12px; font-weight: 650; }
+    .card-heading span { color: #828da0; font: 9px var(--mono); }
+    .step-content { min-height: 118px; padding: 17px; }
+    .step-content .step-name { margin: 0 0 7px; color: #a9bbff; font: 10px var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+    .step-content h3 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -.03em; }
+    .step-content p { max-width: 670px; margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .activity { min-height: 118px; max-height: 170px; padding: 5px 17px 12px; overflow: auto; border-top: 1px solid #262d39; }
+    .activity-row { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; color: #b2bac7; font: 10px/1.55 var(--mono); animation: appear .25s ease both; }
+    .activity-row time { flex: 0 0 49px; color: #667185; }
+    .activity-dot { flex: 0 0 5px; height: 5px; margin-top: 4px; border-radius: 50%; background: #a5b6ff; }
+    .activity-row[data-kind="success"] .activity-dot { background: var(--green); }
+    .activity-row[data-kind="note"] .activity-dot { background: #f2c273; }
+    .preview { padding-bottom: 15px; }
+    .preview-actions { display: flex; align-items: center; gap: 9px; }
+    .preview-actions button { min-height: 29px; padding: 0 9px; border: 1px solid #47516a; border-radius: 6px; background: #1a2231; color: #dce4f6; font-size: 10px; cursor: pointer; }
+    .preview-actions button:hover { border-color: #8297d2; background: #202b40; }
+    .preview-status { color: #828da0; font: 9px var(--mono); }
+    .preview-top { display: flex; align-items: center; gap: 6px; padding: 11px 14px; border-bottom: 1px solid #262d39; color: #7e899b; font: 9px var(--mono); }
+    .window-dots { display: flex; gap: 4px; margin-right: 6px; }
+    .window-dots i { width: 6px; height: 6px; border-radius: 50%; background: #f08080; }
+    .window-dots i:nth-child(2) { background: #e7bd6a; }
+    .window-dots i:nth-child(3) { background: #64c58c; }
+    .preview-placeholder { display: grid; min-height: 288px; place-content: center; justify-items: center; gap: 10px; margin: 14px; padding: 25px; border: 1px dashed #394354; border-radius: 10px; background: radial-gradient(ellipse at center, #1a2230, #11151d 70%); text-align: center; }
+    .preview-lock { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid #38445a; border-radius: 12px; background: #1c2535; color: #a8baff; font-size: 19px; }
+    .preview-placeholder strong { font-size: 13px; }
+    .preview-placeholder p { max-width: 280px; margin: 0; color: #8d97a8; font-size: 11px; line-height: 1.6; }
+    .coffee-frame { display: block; width: calc(100% - 28px); height: 335px; margin: 14px; border: 1px solid #45443d; border-radius: 9px; background: #f5efe5; }
+    .orchestration { display: grid; gap: 8px; margin: 14px 17px 16px; padding-top: 12px; border-top: 1px solid #262d39; }
+    .orchestration-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 8px; color: #aab3c2; font-size: 10px; line-height: 1.5; }
+    .orchestration-row > span { color: #7e899b; font: 9px var(--mono); letter-spacing: .04em; }
+    .orchestration-row code { color: #c5d0f3; font: 10px var(--mono); overflow-wrap: anywhere; }
+    .orchestration-row p { margin: 0; }
+    .preview-dialog { width: min(1120px, calc(100vw - 32px)); max-width: none; padding: 0; overflow: hidden; border: 1px solid #394354; border-radius: 14px; background: #10141c; color: var(--text); box-shadow: 0 26px 100px #0009; }
+    .preview-dialog::backdrop { background: #05070bd9; backdrop-filter: blur(5px); }
+    .dialog-head { display: flex; min-height: 56px; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #29303c; }
+    .dialog-head strong { font-size: 12px; }
+    .dialog-head button { width: 30px; height: 30px; border: 1px solid #394354; border-radius: 7px; background: #171d28; cursor: pointer; }
+    .dialog-frame { display: block; width: 100%; height: min(78vh, 760px); border: 0; background: #f5efe5; }
+    .files { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px; }
+    .file-chip { padding: 5px 7px; border: 1px solid #2a3240; border-radius: 5px; background: #141923; color: #a5afc0; font: 9px var(--mono); }
+    .file-chip.new { border-color: #335542; color: #a5d7b9; animation: appear .3s ease both; }
+    .footnote { margin: 21px 0 0; color: #657084; font-size: 10px; line-height: 1.6; text-align: center; }
+    .footnote strong { color: #939eb1; font-weight: 600; }
+    @keyframes appear { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 900px) { .page { width: min(100% - 36px, 760px); } .intro { grid-template-columns: 1fr; gap: 20px; } .idea-card { max-width: 600px; } .stages { grid-template-columns: repeat(3, 1fr); } .stage:nth-child(3)::after { display: none; } .stage:nth-child(4)::after { display: block; } .lower-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .page { width: calc(100% - 28px); padding-top: 15px; } .topbar { padding-bottom: 16px; } .intro { padding: 31px 0 21px; gap: 17px; } h1 { font-size: 36px; } .lead { font-size: 12px; } .pipeline-panel { padding: 16px 12px; } .section-top { align-items: flex-start; flex-direction: column; } .run-controls { width: 100%; justify-content: space-between; } .stages { gap: 7px; } .stage { min-height: 94px; padding: 10px 8px; } .stage h3 { margin-top: 11px; font-size: 12px; } .stage p { font-size: 9px; } .stage-command { margin-top: 7px; font-size: 8px; } .stage:not(:last-child)::after { right: -8px; width: 8px; } .stage:nth-child(3)::after { display: none; } .stage:nth-child(4)::after { display: block; } .card-heading { padding: 0 13px; } .orchestration { margin-inline: 13px; } .orchestration-row { grid-template-columns: 88px minmax(0, 1fr); } .preview-status { display: none; } .coffee-frame { height: 300px; } .footnote { margin-top: 16px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Spec to Ship home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>spec<em>to</em>ship</span>
+      </a>
+      <span class="demo-badge">INTERACTIVE PRODUCT DEMO</span>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">From idea to working product, in one flow</p>
+        <h1 id="page-title">Describe an idea.<br><span>Get it ready to ship.</span></h1>
+        <p class="lead">Spec to Ship is an AI-powered project workspace that turns a product idea into a product definition, development plan, working application code, and quality checks. This fixed demo walks through how skills and specialized agent roles contribute at each step.</p>
+      </div>
+      <aside class="idea-card" aria-label="Demo idea and tools">
+        <small>Idea featured in this demo</small>
+        <p>“Create a coffee shop landing page”</p>
+        <div class="skill-agent-note"><strong>Skills</strong> describe how each step should be carried out. <strong>Agent</strong> roles review the work from specialized perspectives; three experts run in parallel in the final stage.</div>
+      </aside>
+    </section>
+
+    <section class="pipeline-panel" aria-labelledby="pipeline-title">
+      <div class="section-top">
+        <div><h2 id="pipeline-title">A six-stage development workflow</h2><p>Each card represents one part of turning an idea into a product.</p></div>
+        <div class="run-controls">
+          <span class="run-state" id="runState" data-state="idle" role="status" aria-live="polite">Ready to start</span>
+          <button class="primary-btn" id="runButton" type="button">Start the demo <span aria-hidden="true">↗</span></button>
+        </div>
+      </div>
+      <div class="stages" id="stages" aria-label="Demo stages">
+        <article class="stage" data-stage="0"><div class="stage-index"><span>01 / DEFINE</span><span class="stage-mark">○</span></div><h3>Define the idea</h3><p>Clarify the need</p><span class="stage-command">/spec</span></article>
+        <article class="stage" data-stage="1"><div class="stage-index"><span>02 / PLAN</span><span class="stage-mark">○</span></div><h3>Plan the work</h3><p>Sequence the tasks</p><span class="stage-command">/plan</span></article>
+        <article class="stage" data-stage="2"><div class="stage-index"><span>03 / BUILD</span><span class="stage-mark">○</span></div><h3>Build the app</h3><p>Generate the code</p><span class="stage-command">/build</span></article>
+        <article class="stage" data-stage="3"><div class="stage-index"><span>04 / VERIFY</span><span class="stage-mark">○</span></div><h3>Test it</h3><p>Validate and fix</p><span class="stage-command">/test</span></article>
+        <article class="stage" data-stage="4"><div class="stage-index"><span>05 / REVIEW</span><span class="stage-mark">○</span></div><h3>Review quality</h3><p>Assess the risks</p><span class="stage-command">/review</span></article>
+        <article class="stage" data-stage="5"><div class="stage-index"><span>06 / SHIP</span><span class="stage-mark">○</span></div><h3>Prepare to ship</h3><p>Decision and preview</p><span class="stage-command">/ship</span></article>
+      </div>
+      <div class="progress-track" role="progressbar" aria-label="Demo ilerlemesi" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0"><div class="progress-fill" id="progressFill"></div></div>
+    </section>
+
+    <div class="lower-grid">
+      <section class="card" aria-labelledby="explanation-title" aria-live="polite">
+        <header class="card-heading"><h2 id="explanation-title">What happens at this step?</h2><span id="stepCounter">STEP 0 / 6</span></header>
+        <div class="step-content" id="stepContent">
+          <p class="step-name">Getting started</p><h3>From idea to product</h3>
+          <p>Select “Start the demo” to begin. Each stage takes about two seconds; explanations, sample output files, and the activity log update as the demo runs.</p>
+        </div>
+        <div class="orchestration" aria-label="Skills and agent roles used in this stage">
+          <div class="orchestration-row"><span>ACTIVE SKILL</span><code id="activeSkill">Ready to start</code></div>
+          <div class="orchestration-row"><span>AGENT ROLES</span><p id="activeAgents">The expertise used at each step will appear here once the demo starts.</p></div>
+        </div>
+        <div class="activity" id="activity" role="log" aria-label="Demo activity log" aria-live="polite" aria-relevant="additions"></div>
+      </section>
+
+      <section class="card preview" aria-labelledby="preview-title">
+        <header class="card-heading"><h2 id="preview-title">Generated landing page preview</h2><div class="preview-actions"><span class="preview-status" id="previewStatus">AVAILABLE AT THE END</span><button id="openPreview" type="button" hidden>View larger ↗</button></div></header>
+        <div class="preview-top"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>preview / crema-coffee</span><span style="margin-left:auto">● mock build</span></div>
+        <div class="preview-placeholder" id="previewPlaceholder"><span class="preview-lock" aria-hidden="true">⌑</span><strong>Preview not ready yet</strong><p>The coffee shop landing page mockup will appear here when the six-stage demo is complete.</p></div>
+        <iframe class="coffee-frame" id="generatedPreview" title="Crema Coffee shop landing page preview" sandbox="" hidden></iframe>
+        <div class="files" id="fileList" aria-label="Files created during the demo"></div>
+      </section>
+    </div>
+    <p class="footnote"><strong>Note:</strong> This page is a product demo powered by fixed sample data. It does not send real AI requests, create files, or deploy an application. To try the live pipeline, start an idea from the home page.</p>
+  </main>
+  <dialog class="preview-dialog" id="previewDialog" aria-labelledby="dialogTitle">
+    <div class="dialog-head"><strong id="dialogTitle">Crema Coffee — landing page preview</strong><button id="closePreview" type="button" aria-label="Close preview">×</button></div>
+    <iframe class="dialog-frame" id="dialogFrame" title="Large Crema Coffee landing page preview" sandbox=""></iframe>
+  </dialog>
+  <script>
+    (() => {
+      const coffeeShopHtml = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crema Coffee — Good coffee, good company</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #29271f; background: #f5efe5; font-family: Georgia, 'Times New Roman', serif; }
+    .site { max-width: 980px; margin: auto; padding: 0 34px; }
+    nav { display: flex; height: 67px; align-items: center; justify-content: space-between; border-bottom: 1px solid #ded6c9; font-family: Arial, sans-serif; }
+    .logo { color: #372b20; font-size: 15px; font-weight: 800; letter-spacing: .16em; text-decoration: none; }
+    .navlinks { display: flex; gap: 24px; color: #615b50; font-size: 11px; }
+    .navlinks a { color: inherit; text-decoration: none; }
+    .nav-cta, .button { padding: 10px 15px; border: 0; border-radius: 4px; background: #344a38; color: #fffaf1; font: 11px Arial, sans-serif; text-decoration: none; }
+    .hero { display: grid; min-height: 385px; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 38px; padding: 38px 0; }
+    .eyebrow { color: #8a6b42; font: 10px Arial, sans-serif; letter-spacing: .2em; text-transform: uppercase; }
+    h1 { max-width: 470px; margin: 17px 0 14px; font-size: clamp(42px, 6vw, 69px); font-weight: 400; letter-spacing: -.065em; line-height: .98; }
+    h1 em { color: #66754e; font-weight: 400; }
+    .intro { max-width: 390px; color: #6e695f; font: 13px/1.8 Arial, sans-serif; }
+    .hero-actions { display: flex; align-items: center; gap: 18px; margin-top: 23px; }
+    .text-link { color: #5c654a; font: 11px Arial, sans-serif; text-decoration: none; }
+    .art { position: relative; display: grid; min-height: 295px; place-items: center; overflow: hidden; border-radius: 48% 48% 5px 5px; background: #d9c5a5; }
+    .art::before, .art::after { position: absolute; width: 230px; height: 230px; border: 1px solid #f4e6cb66; border-radius: 50%; content: ''; }
+    .art::after { width: 290px; height: 290px; }
+    .sun { position: absolute; top: 30px; right: 35px; width: 54px; height: 54px; border-radius: 50%; background: #f0e2c8; }
+    .cup { position: relative; z-index: 1; width: 130px; height: 116px; margin-top: 40px; border-radius: 7px 7px 42px 42px; background: linear-gradient(100deg, #fffaf1, #e9dece); box-shadow: 0 24px 28px #51402935; }
+    .cup::before { position: absolute; top: 8px; left: 8px; right: 8px; height: 13px; border-radius: 50%; background: #533a2a; content: ''; }
+    .cup::after { position: absolute; top: 24px; right: -32px; width: 36px; height: 40px; border: 9px solid #eee4d5; border-left: 0; border-radius: 0 22px 22px 0; content: ''; }
+    .saucer { position: absolute; z-index: 0; bottom: 38px; width: 205px; height: 23px; border-radius: 50%; background: #f1e6d4; box-shadow: 0 9px 14px #51402922; }
+    .art-note { position: absolute; right: 16px; bottom: 15px; color: #64513b; font: 9px Arial, sans-serif; letter-spacing: .12em; }
+    .menu { padding: 27px 0 32px; border-top: 1px solid #ded6c9; }
+    .menu-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    h2 { margin: 0; font-size: 28px; font-weight: 400; letter-spacing: -.04em; }
+    .menu-head p { margin: 0; color: #777166; font: 10px Arial, sans-serif; }
+    .drinks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; }
+    .drink { padding: 15px; border: 1px solid #ded6c9; border-radius: 5px; }
+    .drink small { color: #98784b; font: 9px Arial, sans-serif; letter-spacing: .13em; }
+    .drink h3 { margin: 8px 0 6px; font-size: 17px; font-weight: 400; }
+    .drink p { margin: 0; color: #797368; font: 10px/1.6 Arial, sans-serif; }
+    footer { display: flex; justify-content: space-between; padding: 17px 0 22px; border-top: 1px solid #ded6c9; color: #81796e; font: 9px Arial, sans-serif; }
+    @media (max-width: 620px) { .site { padding: 0 19px; } .navlinks { gap: 10px; } .navlinks a:nth-child(2) { display: none; } .hero { grid-template-columns: 1fr; gap: 22px; padding: 32px 0; } .art { min-height: 235px; } .drinks { grid-template-columns: 1fr; } .menu-head { align-items: start; flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <nav><a class="logo" href="#top">CREMA COFFEE</a><div class="navlinks"><a href="#story">Our story</a><a href="#menu">Menu</a><a href="#visit">Find us</a></div><a class="nav-cta" href="#visit">Visit our café</a></nav>
+    <main id="top">
+      <section class="hero" id="story">
+        <div><div class="eyebrow">A neighborhood coffee house</div><h1>Good coffee.<br><em>Good company.</em></h1><p class="intro">Thoughtfully sourced beans, carefully made cups, and a little room in your day to slow down. Come find your new favorite corner.</p><div class="hero-actions"><a class="button" href="#menu">Explore the menu</a><a class="text-link" href="#visit">A little about us ↗</a></div></div>
+        <div class="art" role="img" aria-label="Illustration of a freshly brewed coffee cup"><span class="sun"></span><span class="saucer"></span><span class="cup"></span><span class="art-note">SLOW MORNINGS START HERE</span></div>
+      </section>
+      <section class="menu" id="menu"><div class="menu-head"><h2>Made with care.</h2><p>Good things, made fresh every day.</p></div><div class="drinks"><article class="drink"><small>01 · THE CLASSIC</small><h3>House espresso</h3><p>Chocolate notes, a soft finish, and beans roasted close to home.</p></article><article class="drink"><small>02 · A LITTLE COMFORT</small><h3>Honey oat latte</h3><p>Double espresso, velvety oat milk, and a touch of local honey.</p></article><article class="drink"><small>03 · SOMETHING SWEET</small><h3>Cardamom bun</h3><p>Warm, flaky, and baked in small batches every morning.</p></article></div></section>
+    </main>
+    <footer id="visit"><span>CREMA COFFEE · MADE FOR SLOWER DAYS</span><span>Open daily · 8am–5pm</span></footer>
+  </div>
+</body>
+</html>`;
+      const steps = [
+        { name: 'DEFINE · Define the idea', title: 'Turns the idea into a clear product definition.', body: 'Starting from “Create a coffee shop landing page,” it identifies the goal, audience, and key page sections, then captures them in SPEC.md.', skill: 'spec-driven-development', agents: 'The main pipeline handles this step; there is no separate specialist agent fan-out.', log: 'Analyzed the landing page idea and identified its goal and core content sections.', files: ['SPEC.md'] },
+        { name: 'PLAN · Plan the work', title: 'Breaks the product definition into actionable tasks.', body: 'Creates an ordered development plan and a trackable task list based on the product definition and its dependencies.', skill: 'planning-and-task-breakdown', agents: 'The main pipeline creates the plan; there is no separate specialist agent fan-out.', log: 'Created an ordered implementation plan and task list for the landing page.', files: ['tasks/plan.md', 'tasks/todo.md'] },
+        { name: 'BUILD · Build the app', title: 'Turns the plan into a working landing page.', body: 'Builds the interface, visual styles, and browser behavior. In the live workflow, incremental implementation and TDD guidance support this step.', skill: 'incremental-implementation · test-driven-development', agents: 'The main pipeline creates the application files; there is no separate specialist agent fan-out.', log: 'Created the Crema Coffee landing page interface and responsive styles.', files: ['index.html', 'style.css', 'logic.js', 'app.js'] },
+        { name: 'VERIFY · Test it', title: 'Runs automated tests against the generated code.', body: 'Prepares a test file and runs it with the Node test runner. Failed results are preserved and passed on to the following review steps.', skill: 'test-driven-development', agents: 'The main pipeline runs the tests; there is no separate specialist agent fan-out.', log: 'Ran automated checks and passed the results on to the review steps.', files: ['test/logic.test.js'] },
+        { name: 'REVIEW · Review quality', title: 'Reviews the code across five quality dimensions.', body: 'Reports findings on correctness, readability, architecture, security, and performance, with suggested fixes for each finding.', skill: 'code-review-and-quality', agents: 'There is no separate agent fan-out at this stage; specialist agents join in the following SHIP step.', log: 'Completed a five-dimension code review and documented recommendations.', files: ['REVIEW.md'] },
+        { name: 'SHIP · Prepare to ship', title: 'Combines reports from three specialist agents and opens the preview.', body: 'The code-reviewer, security-auditor, and test-engineer run in parallel. The main orchestrator combines their reports, makes a GO / NO-GO decision, and presents the application preview if approved.', skill: 'shipping-and-launch', agents: 'code-reviewer · security-auditor · test-engineer (parallel fan-out; reports are combined by the main orchestrator).', log: 'Combined reports from three specialist agents; the mock flow approved the preview with a GO decision.', files: ['SHIP_REPORT.md', 'Application preview'] },
+      ];
+      const stages = [...document.querySelectorAll('.stage')];
+      const runButton = document.getElementById('runButton');
+      const runState = document.getElementById('runState');
+      const progressFill = document.getElementById('progressFill');
+      const progressTrack = document.querySelector('.progress-track');
+      const activity = document.getElementById('activity');
+      const stepContent = document.getElementById('stepContent');
+      const stepCounter = document.getElementById('stepCounter');
+      const fileList = document.getElementById('fileList');
+      const activeSkill = document.getElementById('activeSkill');
+      const activeAgents = document.getElementById('activeAgents');
+      const generatedPreview = document.getElementById('generatedPreview');
+      const previewPlaceholder = document.getElementById('previewPlaceholder');
+      const previewStatus = document.getElementById('previewStatus');
+      const openPreview = document.getElementById('openPreview');
+      const previewDialog = document.getElementById('previewDialog');
+      const dialogFrame = document.getElementById('dialogFrame');
+      const seenFiles = new Set();
+      let running = false;
+
+      const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+      function addLog(text, kind = 'info') {
+        const row = document.createElement('div');
+        row.className = 'activity-row';
+        row.dataset.kind = kind;
+        const time = document.createElement('time');
+        time.textContent = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
+        const dot = document.createElement('i');
+        dot.className = 'activity-dot';
+        dot.setAttribute('aria-hidden', 'true');
+        const message = document.createElement('span');
+        message.textContent = text;
+        row.append(time, dot, message);
+        activity.append(row);
+        activity.scrollTop = activity.scrollHeight;
+      }
+      function revealFiles(files) {
+        for (const name of files) {
+          if (seenFiles.has(name)) continue;
+          seenFiles.add(name);
+          const chip = document.createElement('span');
+          chip.className = 'file-chip new';
+          chip.textContent = name;
+          fileList.append(chip);
+        }
+      }
+      function showStep(index) {
+        const step = steps[index];
+        stepCounter.textContent = `STEP ${index + 1} / ${steps.length}`;
+        activeSkill.textContent = step.skill;
+        activeAgents.textContent = step.agents;
+        stepContent.replaceChildren();
+        const name = document.createElement('p'); name.className = 'step-name'; name.textContent = step.name;
+        const title = document.createElement('h3'); title.textContent = step.title;
+        const body = document.createElement('p'); body.textContent = step.body;
+        stepContent.append(name, title, body);
+      }
+      function resetDemo() {
+        stages.forEach((stage) => { stage.classList.remove('active', 'done'); stage.querySelector('.stage-mark').textContent = '○'; });
+        activity.replaceChildren();
+        fileList.replaceChildren();
+        seenFiles.clear();
+        generatedPreview.hidden = true;
+        generatedPreview.removeAttribute('srcdoc');
+        previewPlaceholder.hidden = false;
+        previewStatus.textContent = 'AVAILABLE AT THE END';
+        openPreview.hidden = true;
+        if (previewDialog.open) previewDialog.close();
+        activeSkill.textContent = 'Ready to start';
+        activeAgents.textContent = 'The expertise used at each step will appear here once the demo starts.';
+        progressFill.style.width = '0%';
+        progressTrack.setAttribute('aria-valuenow', '0');
+        stepCounter.textContent = 'STEP 0 / 6';
+        stepContent.innerHTML = '<p class="step-name">Getting started</p><h3>From idea to product</h3><p>Each stage takes about two seconds. Skills and agent roles update at every step; the landing page preview opens when the final stage is complete.</p>';
+      }
+      async function runDemo() {
+        if (running) return;
+        running = true;
+        resetDemo();
+        runButton.disabled = true;
+        runButton.textContent = 'Demo in progress…';
+        runState.dataset.state = 'running';
+        runState.textContent = 'Demo in progress';
+        addLog('Started the fixed sample request: “Create a coffee shop landing page”.', 'note');
+        for (let index = 0; index < steps.length; index += 1) {
+          const stage = stages[index];
+          stage.classList.add('active');
+          stage.querySelector('.stage-mark').textContent = '…';
+          showStep(index);
+          addLog(`${steps[index].name} stage started.`);
+          await wait(2000);
+          revealFiles(steps[index].files);
+          addLog(steps[index].log, 'success');
+          stage.classList.remove('active');
+          stage.classList.add('done');
+          stage.querySelector('.stage-mark').textContent = '✓';
+          const progress = Math.round(((index + 1) / steps.length) * 100);
+          progressFill.style.width = `${progress}%`;
+          progressTrack.setAttribute('aria-valuenow', String(index + 1));
+          await wait(220);
+        }
+        runState.dataset.state = 'done';
+        runState.textContent = 'Demo complete · GO';
+        generatedPreview.srcdoc = coffeeShopHtml;
+        generatedPreview.hidden = false;
+        previewPlaceholder.hidden = true;
+        previewStatus.textContent = 'MOCK PREVIEW READY';
+        openPreview.hidden = false;
+        runButton.disabled = false;
+        runButton.innerHTML = 'Replay the demo <span aria-hidden="true">↻</span>';
+        addLog('Demo complete. The fixed Crema Coffee landing page preview is now open.', 'success');
+        running = false;
+      }
+
+      openPreview.addEventListener('click', () => {
+        if (generatedPreview.srcdoc) {
+          dialogFrame.srcdoc = generatedPreview.srcdoc;
+          previewDialog.showModal();
+        }
+      });
+      document.getElementById('closePreview').addEventListener('click', () => previewDialog.close());
+      previewDialog.addEventListener('click', (event) => {
+        if (event.target === previewDialog) previewDialog.close();
+      });
+      runButton.addEventListener('click', runDemo);
+    })();
+  </script>
+</body>
+</html>

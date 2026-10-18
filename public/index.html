@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090b10" />
+  <title>Spec to Ship — AI project workspace</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Project and chat sidebar">
+      <a class="brand" href="#" aria-label="Spec to Ship home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-name">spec<span>to</span>ship</span>
+      </a>
+
+      <button class="new-project-btn" id="newProjectBtn" type="button">
+        <span aria-hidden="true">＋</span> New project
+        <kbd>⌘ K</kbd>
+      </button>
+
+      <div class="sidebar-section">
+        <div class="section-heading"><span>PROJECTS</span><span class="section-count" id="projectCount">0</span></div>
+        <nav class="project-list" id="projectList" aria-label="Projects"></nav>
+        <p class="sidebar-empty" id="sidebarEmpty">Your projects will appear here.</p>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="pipeline-note"><span class="online-dot"></span><span>AI pipeline ready</span></div>
+        <div class="sidebar-caption">Build ideas into shipped software.</div>
+      </div>
+    </aside>
+
+    <main class="workspace" id="workspace">
+      <header class="workspace-topbar">
+        <div class="breadcrumb"><span>Workspace</span><span class="breadcrumb-slash">/</span><strong id="projectHeading">New project</strong></div>
+        <div class="topbar-actions">
+          <span class="topbar-label"><span class="online-dot"></span> All systems operational</span>
+        </div>
+      </header>
+
+      <section class="composer-view" id="composerView" aria-labelledby="welcomeTitle">
+        <div class="composer-content">
+          <div class="eyebrow"><span class="eyebrow-line"></span> YOUR NEXT BUILD STARTS HERE</div>
+          <h1 id="welcomeTitle">What do you want<br /><span>to build today?</span></h1>
+          <p class="welcome-copy">Describe your idea. Your AI team will turn it into a plan, build it, test it, and get it ready to ship.</p>
+          <form class="idea-form" id="ideaForm">
+            <label class="visually-hidden" for="ideaInput">Describe your project idea</label>
+            <textarea id="ideaInput" rows="3" placeholder="A lightweight task manager with priorities, due dates, and a clean dashboard…" autocomplete="off" spellcheck="false" required></textarea>
+            <div class="composer-footer">
+              <span class="composer-hint"><span class="return-icon">↵</span> Press Enter to start · Shift + Enter for a new line</span>
+              <button class="launch-btn" type="submit" aria-label="Start building this project"><span>Start building</span><span aria-hidden="true">↗</span></button>
+            </div>
+          </form>
+          <p class="form-error" id="formError" role="alert" hidden></p>
+          <div class="pipeline-preview" aria-label="Pipeline stages">
+            <span>SPEC</span><i></i><span>PLAN</span><i></i><span>BUILD</span><i></i><span>TEST</span><i></i><span>REVIEW</span><i></i><span>SHIP</span>
+          </div>
+        </div>
+        <div class="composer-orb orb-one"></div><div class="composer-orb orb-two"></div>
+      </section>
+
+      <section class="project-view" id="projectView" aria-label="Project pipeline" hidden>
+        <div class="project-scroll">
+          <div class="project-title-row">
+            <div><p class="project-kicker">ACTIVE PROJECT</p><h1 id="projectTitle">Project</h1></div>
+            <div class="run-controls" id="runControls" hidden>
+              <button class="control-btn pause-btn" id="pauseBtn" type="button"><span aria-hidden="true">Ⅱ</span> Pause</button>
+              <button class="control-btn resume-btn" id="resumeBtn" type="button" hidden><span aria-hidden="true">▶</span> Resume</button>
+              <button class="control-btn abort-btn" id="abortBtn" type="button"><span aria-hidden="true">■</span> Abort</button>
+            </div>
+          </div>
+
+          <div class="run-status-banner" id="runStatusBanner" role="status" hidden></div>
+
+          <div class="pipeline" id="pipeline" aria-label="Build pipeline">
+            <div class="stage" data-step="spec" style="--c:var(--c-define)"><span class="stage-label">DEFINE</span><div class="stage-card"><span class="stage-title">Idea</span><span class="stage-sub">Refine</span></div><span class="stage-cmd">/spec</span></div>
+            <div class="connector" data-after="spec"></div>
+            <div class="stage" data-step="plan" style="--c:var(--c-plan)"><span class="stage-label">PLAN</span><div class="stage-card"><span class="stage-title">Spec</span><span class="stage-sub">PRD</span></div><span class="stage-cmd">/plan</span></div>
+            <div class="connector" data-after="plan"></div>
+            <div class="stage" data-step="build" style="--c:var(--c-build)"><span class="stage-label">BUILD</span><div class="stage-card"><span class="stage-title">Code</span><span class="stage-sub">Implement</span></div><span class="stage-cmd">/build</span></div>
+            <div class="connector" data-after="build"></div>
+            <div class="stage" data-step="test" style="--c:var(--c-verify)"><span class="stage-label">VERIFY</span><div class="stage-card"><span class="stage-title">Test</span><span class="stage-sub">Debug</span></div><span class="stage-cmd">/test</span></div>
+            <div class="connector" data-after="test"></div>
+            <div class="stage" data-step="review" style="--c:var(--c-review)"><span class="stage-label">REVIEW</span><div class="stage-card"><span class="stage-title">Quality</span><span class="stage-sub">Review</span></div><span class="stage-cmd">/review</span></div>
+            <div class="connector" data-after="review"></div>
+            <div class="stage" data-step="ship" style="--c:var(--c-ship)"><span class="stage-label">SHIP</span><div class="stage-card"><span class="stage-title">Launch</span><span class="stage-sub">Preview</span></div><span class="stage-cmd">/ship</span></div>
+          </div>
+
+          <section class="detail" id="detail" aria-live="polite">
+            <div class="detail-head"><span class="detail-cmd" id="detailCmd">/spec</span><span class="detail-title" id="detailTitle">Idea — Refine</span><span class="detail-status" id="detailStatus">Waiting to start</span></div>
+            <div class="detail-body" id="detailBody"><p class="detail-empty">Pipeline activity and generated files will appear here.</p></div>
+          </section>
+
+          <div class="run-footer" id="runFooter" hidden><span id="runFooterText"></span><a id="previewLink" class="preview-link" target="_blank" rel="noopener" hidden>Open preview <span aria-hidden="true">↗</span></a></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+node_modules/
+.env
+workspaces/
+.DS_Store
+# Optional upstream source checkout; the app uses the tracked pipeline-assets/ pack.
+agent-skills

@@ -1,0 +1,17 @@
+{
+  "name": "spec-to-ship",
+  "version": "1.0.0",
+  "description": "An AI-powered project workspace that turns ideas into deployed applications",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "lsof -ti:${PORT:-3000} | xargs kill -9 2>/dev/null; node --watch server/index.js",
+    "test": "node test-pipeline-security.js && node test-pipeline-mock.js && node test-pipeline-fallback.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "openai": "^4.67.0"
+  }
+}
