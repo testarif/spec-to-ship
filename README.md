@@ -1,6 +1,6 @@
 # Spec to Ship
 
-![Spec to Ship workspace screenshot](assets/screenshoot.png)
+![Spec to Ship workspace screenshot](assets/pipeline-flow.gif)
 
 **Spec to Ship** is an agentic software-development prototype that turns a product idea written in natural language into a specification, implementation plan, working web application, tests, and quality reports, with a browser-based preview of the result.
 
